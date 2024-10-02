@@ -13,7 +13,7 @@ namespace MyPublicAPI.Controllers
     {
         private readonly ApiContext _context;
 
-        private string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcl9pZCI6IjkxZTUyNzFjLTRlZjUtNGRjNy05ZDcyLTI1NTNmYjllZGZjNCIsInVzZWRfZm9yIjoiQm9raW8gRGVtbyIsImlhdCI6MTUxNjIzOTAyMn0.SxB83Le6FxypBuDVF_YCt8bNoh7iAKfxIcLwA4BBZQY"
+        private string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwidXNlcl9pZCI6IjkxZTUyNzFjLTRlZjUtNGRjNy05ZDcyLTI1NTNmYjllZGZjNCIsInVzZWRfZm9yIjoiQm9raW8gRGVtbyIsImlhdCI6MTUxNjIzOTAyMn0.SxB83Le6FxypBuDVF_YCt8bNoh7iAKfxIcLwA4BBZQY";
 
         public ProductsController(ApiContext context)
         {
