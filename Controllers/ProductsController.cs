@@ -1,9 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MyPublicAPI.Data;
-using MyPublicAPI.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace MyPublicAPI.Controllers
 {

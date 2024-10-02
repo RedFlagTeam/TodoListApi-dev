@@ -1,5 +1,3 @@
-using System.Reflection.Metadata;
-
 namespace MyPublicAPI.Models
 {
     public class File
@@ -13,6 +11,7 @@ namespace MyPublicAPI.Models
 
         public required string Type { get; set; }
         public required string VerificationNumber { get; set; }
+        public required Guid CompanyId{ get; set; }
 
     }
 }

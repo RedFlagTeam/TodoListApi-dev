@@ -2,72 +2,83 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyPublicAPI.Data;
 using MyPublicAPI.Models;
-using System.Collections.Generic;
-using System.Linq;
+using MyPublicAPI.Exceptions;
 
 namespace MyPublicAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("publicapi/companies/{companyId}/[controller]")]
     [ApiController]
     public class JournalsController(ApiContext context) : ControllerBase
     {
         private readonly ApiContext _context = context;
 
         [HttpGet]
-        public ActionResult<IEnumerable<Journal>> GetJournals()
+        public ActionResult<IEnumerable<Journal>> GetJournals(Guid companyId)
         {
-            return _context.Journals.ToList();
+            EnsureCompanyExists(companyId);
+            var journals = _context.Journals.Where(j => j.CompanyId == companyId).ToList();
+            return Ok(journals);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Journal> GetJournal(Guid id)
+        public ActionResult<Journal> GetJournal(Guid companyId, Guid id)
         {
-            var Journal = _context.Journals.Find(id);
+            EnsureCompanyExists(companyId);
+            var journal = _context.Journals.SingleOrDefault(j => j.CompanyId == companyId && j.Id == id);
 
-            if (Journal == null)
+            if (journal == null)
             {
                 return NotFound();
             }
 
-            return Journal;
+            return Ok(journal);
         }
 
         [HttpPost]
-        public ActionResult<Journal> PostJournal(Journal Journal)
+        public ActionResult<Journal> PostJournal(Guid companyId, Journal journal)
         {
-            _context.Journals.Add(Journal);
+            EnsureCompanyExists(companyId);
+            journal.CompanyId = companyId;
+            _context.Journals.Add(journal);
             _context.SaveChanges();
-
-            return CreatedAtAction(nameof(GetJournal), new { id = Journal.Id }, Journal);
+            return CreatedAtAction(nameof(GetJournal), new { companyId = companyId, id = journal.Id }, journal);
         }
 
         [HttpPut("{id}")]
-        public IActionResult PutJournal(Guid id, Journal Journal)
+        public IActionResult PutJournal(Guid companyId, Guid id, Journal journal)
         {
-            if (id != Journal.Id)
+            EnsureCompanyExists(companyId);
+
+            if (id != journal.Id || companyId != journal.CompanyId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(Journal).State = EntityState.Modified;
+            _context.Entry(journal).State = EntityState.Modified;
             _context.SaveChanges();
-
             return NoContent();
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteJournal(Guid id)
+        public IActionResult DeleteJournal(Guid companyId, Guid id)
         {
-            var Journal = _context.Journals.Find(id);
-            if (Journal == null)
+            EnsureCompanyExists(companyId);
+            var journal = _context.Journals.SingleOrDefault(j => j.CompanyId == companyId && j.Id == id);
+            if (journal == null)
             {
                 return NotFound();
             }
 
-            _context.Journals.Remove(Journal);
+            _context.Journals.Remove(journal);
             _context.SaveChanges();
-
             return NoContent();
+        }
+        private void EnsureCompanyExists(Guid companyId)
+        {
+            if (!_context.UserCompanies.Any(uc => uc.CompanyId == companyId))
+            {
+                throw new CompanyNotFoundException(companyId);
+            }
         }
     }
 }

@@ -1,5 +1,3 @@
-using System.Reflection.Metadata;
-
 namespace MyPublicAPI.Models
 {
     public class Account

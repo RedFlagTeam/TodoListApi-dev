@@ -4,10 +4,8 @@ using File = MyPublicAPI.Models.File;
 
 namespace MyPublicAPI.Data
 {
-    public class ApiContext : DbContext
+    public class ApiContext(DbContextOptions<ApiContext> options) : DbContext(options)
     {
-        public ApiContext(DbContextOptions<ApiContext> options): base(options) {}
-
         public DbSet<Product> Products { get; set; }
         public DbSet<Journal> Journals { get; set; }
 
@@ -16,17 +14,27 @@ namespace MyPublicAPI.Data
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<SubAccount> SubAccounts { get; set; }
-        public DbSet<UserCompany> UserCompanys { get; set; }
+        public DbSet<UserCompany> UserCompanies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<File>()
                 .Property(f => f.Blob)
                 .HasColumnType("varbinary(MAX)"); // Specify the SQL Server data type for the blob field
-             modelBuilder.Entity<UserCompany>()
-                .HasNoKey();
+            modelBuilder.Entity<UserCompany>()
+                .HasKey(uc => new { uc.UserId, uc.CompanyId });
 
             base.OnModelCreating(modelBuilder);
+            // Seed data
+            modelBuilder.Entity<Account>().HasData(
+                new Account { Id = Guid.NewGuid(), AccountNumber = 1234, AccountName = "Main Account", AccountType = "Asset" },
+                new Account { Id = Guid.NewGuid(), AccountNumber = 5678, AccountName = "Expense Account", AccountType = "Expense" }
+            );
+
+            modelBuilder.Entity<UserCompany>().HasData(
+                new UserCompany { UserId = Guid.NewGuid(), CompanyId = Guid.NewGuid() },
+                new UserCompany { UserId = Guid.NewGuid(), CompanyId = Guid.NewGuid() }
+            );
         }
 
     }
