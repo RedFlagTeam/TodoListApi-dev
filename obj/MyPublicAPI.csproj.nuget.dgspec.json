@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/harishankar/Workspace/dotnet/MyPublicAPI/MyPublicAPI.csproj": {}
+    "/Users/harishankar/Workspace/dotnet/public-api-dev/newApi/public-api-dev/MyPublicAPI.csproj": {}
   },
   "projects": {
-    "/Users/harishankar/Workspace/dotnet/MyPublicAPI/MyPublicAPI.csproj": {
+    "/Users/harishankar/Workspace/dotnet/public-api-dev/newApi/public-api-dev/MyPublicAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/harishankar/Workspace/dotnet/MyPublicAPI/MyPublicAPI.csproj",
+        "projectUniqueName": "/Users/harishankar/Workspace/dotnet/public-api-dev/newApi/public-api-dev/MyPublicAPI.csproj",
         "projectName": "MyPublicAPI",
-        "projectPath": "/Users/harishankar/Workspace/dotnet/MyPublicAPI/MyPublicAPI.csproj",
+        "projectPath": "/Users/harishankar/Workspace/dotnet/public-api-dev/newApi/public-api-dev/MyPublicAPI.csproj",
         "packagesPath": "/Users/harishankar/.nuget/packages/",
-        "outputPath": "/Users/harishankar/Workspace/dotnet/MyPublicAPI/obj/",
+        "outputPath": "/Users/harishankar/Workspace/dotnet/public-api-dev/newApi/public-api-dev/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/harishankar/.nuget/NuGet/NuGet.Config"
@@ -43,6 +43,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.8, )"
