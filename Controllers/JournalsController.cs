@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MyPublicAPI.Services;
 using MyPublicAPI.Models;
-using MyPublicAPI.Exceptions;
 
 namespace MyPublicAPI.Controllers
 {

@@ -1,22 +1,12 @@
-using System;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+
 using MyPublicAPI.Data;
-using MyPublicAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace MyPublicAPI.Services
 {
-    public class CompanyService : ICompanyService
+    public class CompanyService(ApiContext context) : ICompanyService
     {
-        private readonly ApiContext _context;
-
-        public CompanyService(ApiContext context)
-        {
-            _context = context;
-        }
+        private readonly ApiContext _context = context;
 
         public async Task<bool> CompanyExistsAsync(Guid companyId)
         {
