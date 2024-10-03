@@ -12,6 +12,7 @@ builder.Configuration.GetConnectionString("DefaultConnection")
 builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddControllers();
+builder.Services.AddScoped<JournalService>(); 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

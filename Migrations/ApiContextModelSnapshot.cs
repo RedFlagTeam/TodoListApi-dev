@@ -40,6 +40,22 @@ namespace MyPublicAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Accounts");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("040727d6-1c5b-437a-9526-1031536d1323"),
+                            AccountName = "Main Account",
+                            AccountNumber = 1234,
+                            AccountType = "Asset"
+                        },
+                        new
+                        {
+                            Id = new Guid("febdfc21-5ce6-4ec9-a1de-e6ec1a3b52d1"),
+                            AccountName = "Expense Account",
+                            AccountNumber = 5678,
+                            AccountType = "Expense"
+                        });
                 });
 
             modelBuilder.Entity("MyPublicAPI.Models.File", b =>
@@ -51,6 +67,9 @@ namespace MyPublicAPI.Migrations
                     b.Property<byte[]>("Blob")
                         .IsRequired()
                         .HasColumnType("varbinary(MAX)");
+
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -89,6 +108,9 @@ namespace MyPublicAPI.Migrations
 
                     b.Property<decimal>("Debit")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("ItemId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -145,13 +167,27 @@ namespace MyPublicAPI.Migrations
 
             modelBuilder.Entity("MyPublicAPI.Models.UserCompany", b =>
                 {
-                    b.Property<Guid>("CompanyId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.ToTable("UserCompanys");
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("UserId", "CompanyId");
+
+                    b.ToTable("UserCompanies");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = new Guid("8b68918c-1636-4997-a73e-f19d181c0c56"),
+                            CompanyId = new Guid("0afe6a62-c857-4d89-a2b3-f01b9b094c7a")
+                        },
+                        new
+                        {
+                            UserId = new Guid("af629495-ca8a-41db-ba1f-40ce4d1c9ce5"),
+                            CompanyId = new Guid("886a91f3-121e-4cc6-9f18-cfefa3ddcf21")
+                        });
                 });
 #pragma warning restore 612, 618
         }

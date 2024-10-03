@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MyPublicAPI.Data;
+using MyPublicAPI.Services;
 using MyPublicAPI.Models;
 using MyPublicAPI.Exceptions;
 
@@ -8,77 +8,56 @@ namespace MyPublicAPI.Controllers
 {
     [Route("publicapi/companies/{companyId}/[controller]")]
     [ApiController]
-    public class JournalsController(ApiContext context) : ControllerBase
+    public class JournalsController : ControllerBase
     {
-        private readonly ApiContext _context = context;
+        private readonly JournalService _journalService;
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Journal>> GetJournals(Guid companyId)
+        public JournalsController(JournalService journalService)
         {
-            EnsureCompanyExists(companyId);
-            var journals = _context.Journals.Where(j => j.CompanyId == companyId).ToList();
-            return Ok(journals);
+            _journalService = journalService;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Journal> GetJournal(Guid companyId, Guid id)
+        [HttpGet]
+        public ActionResult<IEnumerable<JournalDTO>>  GetJournals(Guid companyId)
         {
-            EnsureCompanyExists(companyId);
-            var journal = _context.Journals.SingleOrDefault(j => j.CompanyId == companyId && j.Id == id);
+            var journals = _journalService.GetJournals(companyId);
+            return Ok(journals);
 
-            if (journal == null)
-            {
-                return NotFound();
-            }
+        }
 
+        [HttpGet("{verificationNumber}")]
+        public ActionResult<JournalDTO> GetJournal(Guid companyId, String verificationNumber)
+        {
+            var journal = _journalService.GetJournal(companyId,verificationNumber);
+        
             return Ok(journal);
         }
 
         [HttpPost]
-        public ActionResult<Journal> PostJournal(Guid companyId, Journal journal)
+        public ActionResult<JournalDTO> PostJournal(Guid companyId, JournalDTO journalRequest)
         {
-            EnsureCompanyExists(companyId);
-            journal.CompanyId = companyId;
-            _context.Journals.Add(journal);
-            _context.SaveChanges();
-            return CreatedAtAction(nameof(GetJournal), new { companyId = companyId, id = journal.Id }, journal);
+            var journal  = _journalService.AddJournal(companyId, journalRequest);
+            return Ok(journal);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult PutJournal(Guid companyId, Guid id, Journal journal)
+        // [HttpPut("{id}")]
+        // public IActionResult PutJournal(Guid companyId, Guid id, Journal journal)
+        // {
+
+        // }
+
+        [HttpDelete("{VerificationNumber}")]
+        public IActionResult DeleteJournal(Guid companyId, string VerificationNumber)
         {
-            EnsureCompanyExists(companyId);
 
-            if (id != journal.Id || companyId != journal.CompanyId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(journal).State = EntityState.Modified;
-            _context.SaveChanges();
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult DeleteJournal(Guid companyId, Guid id)
-        {
-            EnsureCompanyExists(companyId);
-            var journal = _context.Journals.SingleOrDefault(j => j.CompanyId == companyId && j.Id == id);
-            if (journal == null)
+            var result = _journalService.DeleteJournal(companyId, VerificationNumber);
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.Journals.Remove(journal);
-            _context.SaveChanges();
             return NoContent();
         }
-        private void EnsureCompanyExists(Guid companyId)
-        {
-            if (!_context.UserCompanies.Any(uc => uc.CompanyId == companyId))
-            {
-                throw new CompanyNotFoundException(companyId);
-            }
-        }
+
     }
 }
