@@ -29,8 +29,11 @@ namespace MyPublicAPI.Middleware
             var statusCode = exception switch
             {
                 CompanyNotFoundException => HttpStatusCode.NotFound,
+                MyPublicAPI.Exceptions.FileNotFoundException => HttpStatusCode.NotFound,
                 _ => HttpStatusCode.InternalServerError
+
             };
+
 
             var result = JsonConvert.SerializeObject(new { error = exception.Message });
             response.StatusCode = (int)statusCode;

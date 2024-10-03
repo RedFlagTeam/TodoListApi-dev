@@ -2,70 +2,37 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyPublicAPI.Data;
 using MyPublicAPI.Models;
-
+using MyPublicAPI.Services;
 namespace MyPublicAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("publicapi/companies/{companyId}/[controller]")]
     [ApiController]
-    public class FilesController(ApiContext context) : ControllerBase
+    public class FilesController(IFileService fileService) : ControllerBase
     {
-        private readonly ApiContext _context = context;
+        private readonly IFileService _fileService = fileService;
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetProducts()
+        [HttpGet("getFilesInfo")]
+        public async Task<IActionResult> GetFilesByCompanyId(Guid companyId, string? journalVerificationNumber = null)
         {
-            return _context.Products.ToList();
+            var files = await _fileService.GetFilesByCompanyIdAsync(companyId, journalVerificationNumber);
+            return Ok(files);
+
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Product> GetProduct(int id)
+        [HttpPost("uploadFile")]
+        public async Task<IActionResult> UploadFile(Guid companyId, IFormFile file, string? journalVerificationNumber = null)
         {
-            var product = _context.Products.Find(id);
+            var fileInfo = await _fileService.UploadFileAsync(companyId, file, journalVerificationNumber);
+            return Ok(new { fileInfo.Id, fileInfo.Name, fileInfo.Size, fileInfo.Type, fileInfo.VerificationNumber });
 
-            if (product == null)
-            {
-                return NotFound();
-            }
+        }
+        [HttpGet("downloadFile")]
+        public async Task<IActionResult> DownloadFile(Guid companyId, string fileName, string? journalVerificationNumber = null)
+        {
+            var fileInfo = await _fileService.DownloadFileByFileName(companyId, fileName, journalVerificationNumber);
+            return Ok(new { fileInfo.Blob });
 
-            return product;
         }
 
-        [HttpPost]
-        public ActionResult<Product> PostProduct(Product product)
-        {
-            _context.Products.Add(product);
-            _context.SaveChanges();
-
-            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
-        }
-
-        [HttpPut("{id}")]
-        public IActionResult PutProduct(int id, Product product)
-        {
-            if (id != product.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(product).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return NoContent();
-        }
-
-        [HttpDelete("{id}")]
-        public IActionResult DeleteProduct(int id)
-        {
-            var product = _context.Products.Find(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            _context.Products.Remove(product);
-            _context.SaveChanges();
-
-            return NoContent();
-        }
     }
 }
