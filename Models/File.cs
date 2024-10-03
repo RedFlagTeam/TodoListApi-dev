@@ -10,7 +10,7 @@ namespace MyPublicAPI.Models
         public required double Size { get; set; }
 
         public required string Type { get; set; }
-        public string VerificationNumber { get; set; }
+        public string? VerificationNumber { get; set; }
         public required Guid CompanyId { get; set; }
 
     }

@@ -71,7 +71,32 @@ namespace MyPublicAPI.Services
             Random random = new();
             string verificationNumber = "V" + random.Next(100, 1000);
 
-            
+            // Validate if the total debit equals credit
+            decimal totalDebit = journalRequest.Items.Sum(item => item.Debit);
+            decimal totalCredit = journalRequest.Items.Sum(item => item.Credit);
+            if (totalDebit != totalCredit)
+            {
+                throw new TotalMisMatchException(totalDebit, totalCredit);
+            }
+            foreach (var item in journalRequest.Items)
+            {
+                // Check if the account number exists in the Account table
+                var accountExists = _context.Accounts
+                    .Any(a => a.AccountNumber == item.Account);
+
+                if (!accountExists)
+                {
+                    // Add to SubAccount table if not present in Account table
+                    var subAccount = new SubAccount
+                    {
+                        Id = Guid.NewGuid(),
+                        SubAccountNumber = item.Account,
+                        AccountNumber = item.Account
+                    };
+
+                    _context.SubAccounts.Add(subAccount);
+                }
+            }
             var journals = journalRequest.Items.Select(item => new Journal
             {
                 Id = Guid.NewGuid(),
@@ -81,9 +106,7 @@ namespace MyPublicAPI.Services
                 Debit = item.Debit,
                 Credit = item.Credit,
                 Account = item.Account,
-                ItemId = new Guid()
-                
-                    
+                ItemId = new Guid()                    
             }).ToList();
 
             _context.Journals.AddRange(journals);
@@ -110,13 +133,22 @@ namespace MyPublicAPI.Services
         public bool DeleteJournal(Guid companyId, string verificationNumber)
         {
             EnsureCompanyExists(companyId);
-            var journal = _context.Journals
-                .SingleOrDefault(j => j.CompanyId == companyId && j.VerificationNumber == verificationNumber);
+            var journals = _context.Journals
+                .Where(j => j.CompanyId == companyId && j.VerificationNumber == verificationNumber)
+                .ToList();
 
-            if (journal == null) return false;
+            // Checking if any journals were found
+            if (!journals.Any())
+            {
+                return false; // Or throw an exception, or handle as needed
+            }
 
-            _context.Journals.Remove(journal);
+            // Remove all found journals
+            _context.Journals.RemoveRange(journals);
+
+            // Persist changes
             _context.SaveChanges();
+
             return true;
         }
         private void EnsureCompanyExists(Guid companyId)
